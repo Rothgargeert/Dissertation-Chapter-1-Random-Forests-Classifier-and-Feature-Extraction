@@ -1,0 +1,112 @@
+---
+title: "MOJV"
+output: html_notebook
+---
+
+
+
+```{r}
+summary(df5)
+```
+
+```{r}
+set.seed(123)
+library(randomForest)
+library(caret)
+```
+
+```{r}
+#Create train/test split 70/30
+set.seed(1234)
+train <- sample(nrow(df5), 0.7*nrow(df5), replace = FALSE)
+TrainSet <- df5[train,]
+ValidSet <- df5[-train,]
+summary(TrainSet)
+summary(ValidSet)
+
+```
+
+
+```{r}
+library(DMwR)
+
+## Smote : Synthetic Minority Oversampling Technique To Handle Class Imbalance In Binary Classification; code below puts it at 1:1 balance
+balanced.data <- SMOTE(MOJV ~., TrainSet, perc.over = 100)
+
+as.data.frame(table(balanced.data$MOJV))
+```
+
+```{r}
+rf1 <- randomForest(MOJV ~ ., data = balanced.data, importance = TRUE)
+rf1
+```
+
+
+
+```{r}
+#Loop to identify right mtry
+a=c()
+i=5
+for (i in 3:8) {
+  rf1 <- randomForest(MOJV ~ ., data = TrainSet, ntree = 1000, mtry = i, importance = TRUE)
+  predValid <- predict(rf1, ValidSet, type = "class")
+  a[i-2] = mean(predValid == ValidSet$MOJV)
+}
+a
+plot(3:8,a)
+```
+
+
+
+
+
+```{r}
+rf1 <- randomForest(MOJV ~ ., data = TrainSet, ntree = 1000, mtry = 7, importance = TRUE)
+rf1
+```
+```{r}
+varImp(rf1)
+```
+```{r}
+varImpPlot(rf1,  
+           sort = T,
+           n.var=25,
+           main="Variable Importance")
+```
+
+```{r}
+#Red/class, black/OOB, green/predictors
+library(randomForest)
+plot(rf1)
+```
+
+```{r}
+predicted.response <- predict(rf1, ValidSet)
+
+
+confusionMatrix(data=predicted.response,  
+                reference=ValidSet$MOJV)
+```
+
+```{r}
+library(pROC)
+rf.probs=predict(rf1,
+                 newdata=ValidSet,
+                 type="prob")
+head(rf.probs)
+```
+```{r}
+#Calculate ROC curve
+rocCurve.rf <- roc(ValidSet$MOJV,rf.probs[,"Positive"])
+#plot the ROC curve
+plot(rocCurve.rf,col=c(1))
+```
+
+```{r}
+auc(rocCurve.rf)
+```
+
+
+
+
+
