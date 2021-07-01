@@ -1,0 +1,129 @@
+---
+title: "MENV"
+output: html_notebook
+---
+
+
+```{r}
+summary(df5)
+```
+```{r}
+df5$MENV <- relevel(df5$MENV, ref = "Positive")
+levels(df5$MENV)
+```
+
+
+
+```{r}
+set.seed(123)
+library(randomForest)
+library(caret)
+```
+
+
+```{r}
+#Create train/test split 70/30
+set.seed(1234)
+train <- sample(nrow(df5), 0.7*nrow(df5), replace = FALSE)
+TrainSet <- df5[train,]
+ValidSet <- df5[-train,]
+summary(TrainSet)
+summary(ValidSet)
+```
+
+
+
+
+```{r}
+library(DMwR)
+
+## Smote : Synthetic Minority Oversampling Technique To Handle Class Imbalance In Binary Classification; code below puts it at 1:1 balance
+balanced.data <- SMOTE(MENV ~., TrainSet, perc.over = 100)
+
+as.data.frame(table(balanced.data$MENV))
+```
+```{r}
+#RF with SMOTE balanced 1:1 data from above
+rf1 <- randomForest(MENV ~ ., data = balanced.data, importance = TRUE)
+rf1
+```
+```{r}
+#Variable importances
+varImp(rf1)
+```
+
+```{r}
+varImpPlot(rf1,  
+           sort = T,
+           n.var=15,
+           main="Variable Importance")
+```
+```{r}
+#Loop to identify right mtry
+a=c()
+i=5
+for (i in 3:8) {
+  rf1 <- randomForest(MENV ~ ., data = TrainSet, ntree = 1000, mtry = i, importance = TRUE)
+  predValid <- predict(rf1, ValidSet, type = "class")
+  a[i-2] = mean(predValid == ValidSet$MENV)
+}
+```
+
+```{r}
+plot(3:8,a)
+```
+
+
+```{r}
+rf2 <- randomForest(MENV ~ ., data = TrainSet, ntree = 1000, mtry = 8, importance = TRUE)
+rf2
+```
+```{r}
+varImp(rf2)
+```
+
+```{r}
+varImpPlot(rf2,  
+           sort = T,
+           n.var = 15,
+           main="Variable Importance")
+```
+
+
+```{r}
+#Red/class, black/OOB, green/predictors
+library(randomForest)
+plot(rf2)
+```
+
+
+```{r}
+predicted.response <- predict(rf2, ValidSet)
+
+
+confusionMatrix(data=predicted.response,  
+                reference=ValidSet$MENV)
+```
+```{r}
+library(pROC)
+rf.probs=predict(rf2,
+                 newdata=ValidSet,
+                 type="prob")
+head(rf.probs)
+```
+```{r}
+#Calculate ROC curve
+rocCurve.rf <- roc(ValidSet$MENV,rf.probs[,"Positive"])
+```
+```{r}
+#plot the ROC curve
+plot(rocCurve.rf,col=c(1))
+```
+
+
+```{r}
+auc(rocCurve.rf)
+```
+
+
+

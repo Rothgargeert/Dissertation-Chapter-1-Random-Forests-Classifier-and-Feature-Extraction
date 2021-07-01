@@ -1,0 +1,121 @@
+---
+title: "LLOV"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+summary(df5)
+```
+```{r}
+df5$LLOV <- relevel(df5$LLOV, ref = "Positive")
+levels(df5$LLOV)
+```
+
+
+
+```{r}
+set.seed(123)
+library(randomForest)
+library(caret)
+```
+
+```{r}
+#Create train/test split 70/30
+set.seed(1234)
+train <- sample(nrow(df5), 0.7*nrow(df5), replace = FALSE)
+TrainSet <- df5[train,]
+ValidSet <- df5[-train,]
+summary(TrainSet)
+summary(ValidSet)
+```
+
+```{r}
+library(DMwR)
+
+## Smote : Synthetic Minority Oversampling Technique To Handle Class Imbalance In Binary Classification; code below puts it at 1:1 balance
+balanced.data <- SMOTE(LLOV ~., TrainSet, perc.over = 100)
+
+as.data.frame(table(balanced.data$LLOV))
+```
+
+```{r}
+rf1 <- randomForest(LLOV ~ ., data = balanced.data, importance = TRUE)
+rf1
+```
+
+```{r}
+#Loop to identify right mtry; below shows 8, 7, 6, and 5 are good
+a=c()
+i=5
+for (i in 3:8) {
+  rf1 <- randomForest(LLOV ~ ., data = TrainSet, ntree = 1000, mtry = i, importance = TRUE)
+  predValid <- predict(rf1, ValidSet, type = "class")
+  a[i-2] = mean(predValid == ValidSet$LLOV)
+}
+a
+plot(3:8,a)
+```
+
+```{r}
+rf1 <- randomForest(LLOV ~ ., data = TrainSet, ntree = 1000, mtry = 8, importance = TRUE)
+rf1
+```
+
+
+```{r}
+varImp(rf1)
+```
+
+```{r}
+varImpPlot(rf1,  
+           sort = T,
+           n.var=15,
+           main="Variable Importance")
+```
+
+```{r}
+#Red/class, black/OOB, green/predictors
+library(randomForest)
+plot(rf1)
+
+```
+
+```{r}
+predicted.response <- predict(rf1, ValidSet)
+
+
+confusionMatrix(data=predicted.response,  
+                reference=ValidSet$LLOV)
+```
+```{r}
+library(pROC)
+rf.probs=predict(rf1,
+                 newdata=ValidSet,
+                 type="prob")
+head(rf.probs)
+```
+
+```{r}
+#Calculate ROC curve
+rocCurve.rf <- roc(ValidSet$LLOV,rf.probs[,"Positive"])
+```
+
+
+```{r}
+#plot the ROC curve
+plot(rocCurve.rf,col=c(1))
+```
+
+
+
+
+```{r}
+auc(rocCurve.rf)
+```
+
+
+
