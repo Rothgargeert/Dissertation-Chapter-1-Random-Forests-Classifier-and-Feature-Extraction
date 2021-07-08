@@ -7,10 +7,8 @@ output: html_notebook
 ```{r}
 summary(df5)
 ```
-```{r}
-df5$EBOV <- relevel(df5$EBOV, ref = "Positive")
-levels(df5$EBOV)
-```
+
+
 
 
 
