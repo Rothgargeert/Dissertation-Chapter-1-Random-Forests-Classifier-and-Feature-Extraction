@@ -8,10 +8,7 @@ output: html_notebook
 ```{r}
 summary(df5)
 ```
-```{r}
-df5$GHV <- relevel(df5$GHV, ref = "Positive")
-levels(df5$GHV)
-```
+
 
 
 
