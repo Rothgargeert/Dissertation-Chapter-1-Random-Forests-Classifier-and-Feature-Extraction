@@ -1,0 +1,55 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+df5
+```
+
+```{r}
+df5$MENV<-factor(df5$MENV, levels=c("Positive", "Negative"))
+
+```
+```{r}
+df5$SARS.COV<-factor(df5$SARS.COV, levels=c("Positive", "Negative"))
+
+df5$BOMBV<-factor(df5$BOMBV, levels=c("Positive", "Negative"))
+
+df5$EBOV<-factor(df5$EBOV, levels=c("Positive", "Negative"))
+
+df5$BDBV<-factor(df5$BDBV, levels=c("Positive", "Negative"))
+
+df5$TAFV<-factor(df5$TAFV, levels=c("Positive", "Negative"))
+
+df5$SUDV<-factor(df5$SUDV, levels=c("Positive", "Negative"))
+
+df5$RESTm<-factor(df5$RESTm, levels=c("Positive", "Negative"))
+
+df5$MARV<-factor(df5$MARV, levels=c("Positive", "Negative"))
+
+df5$RAVV<-factor(df5$RAVV, levels=c("Positive", "Negative"))
+
+df5$LLOV<-factor(df5$LLOV, levels=c("Positive", "Negative"))
+
+df5$MLAV<-factor(df5$MLAV, levels=c("Positive", "Negative"))
+
+```
+
+```{r}
+df5$MOCK<-factor(df5$MOCK, levels=c("Positive", "Negative"))
+
+df5$MOJV<-factor(df5$MOJV, levels=c("Positive", "Negative"))
+
+df5$NIVV<-factor(df5$NIV, levels=c("Positive", "Negative"))
+
+df5$HEV<-factor(df5$HEV, levels=c("Positive", "Negative"))
+
+df5$CEDV<-factor(df5$CEDV, levels=c("Positive", "Negative"))
+
+df5$GHV<-factor(df5$GHV, levels=c("Positive", "Negative"))
+
+
+```
+
