@@ -6,8 +6,8 @@ output: html_notebook
 
 
 ```{r}
-BDBVimp<-df5[, c('TAFV', 'EBOV',
-'SUDV','BDBV','Village','Pig','MENV','LLOV','Cat','Duck')]
+BDBVimp<-df5[, c('BDBV','TAFV', 'EBOV',
+'SUDV','BOMBV','Village','Pig','MENV','LLOV','Cat','Duck', 'RESTm')]
 ```
 
 ```{r}
@@ -117,3 +117,11 @@ create_rfplot <- function(rf, type){
 ```{r}
 create_rfplot(rf2, type = 1)
 ```
+```{r}
+saveRDS(rf2, file="C:/Users/rothg/Desktop/Dissertation Proposal/Random Forests and Feature Importances/BDBV/BDBVRFmodel.rda")
+```
+
+```{r}
+
+```
+
