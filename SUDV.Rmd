@@ -8,11 +8,6 @@ output: html_notebook
 ```{r}
 summary(df5)
 ```
-```{r}
-df5$SUDV <- relevel(df5$SUDV, ref = "Positive")
-levels(df5$SUDV)
-```
-
 
 
 ```{r}
