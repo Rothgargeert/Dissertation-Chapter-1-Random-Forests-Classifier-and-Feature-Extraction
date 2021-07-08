@@ -9,10 +9,7 @@ output: html_notebook
 summary(df5)
 ```
 
-```{r}
-df5$MOJV <- relevel(df5$MOJV, ref = "Positive")
-levels(df5$MOJV)
-```
+
 
 
 ```{r}
@@ -58,7 +55,7 @@ a
 plot(3:8,a)
 ```
 ```{r}
-rf1 <- randomForest(MOJV ~ ., data = TrainSet, ntree = 500, mtry = 7, importance = TRUE)
+rf1 <- randomForest(MOJV ~ ., data = TrainSet, ntree = 500, mtry = 6, importance = TRUE)
 rf1
 ```
 ```{r}
@@ -84,3 +81,22 @@ predicted.response <- predict(rf1, ValidSet)
 confusionMatrix(data=predicted.response,  
                 reference=ValidSet$MOJV)
 ```
+```{r}
+library(pROC)
+rf.probs=predict(rf1,
+                 newdata=ValidSet,
+                 type="prob")
+head(rf.probs)
+```
+```{r}
+#Calculate ROC curve
+rocCurve.rf <- roc(ValidSet$MENV,rf.probs[,"Positive"])
+```
+```{r}
+#plot the ROC curve
+plot(rocCurve.rf,col=c(1))
+```
+```{r}
+auc(rocCurve.rf)
+```
+

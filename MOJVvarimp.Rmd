@@ -6,7 +6,8 @@ output: html_notebook
 
 
 ```{r}
-MOJVimp<-df5[, c('MENV', 'Pig','Village','Duck','Cat','GHV','MOJV')]
+MOJVimp<-df5[, c('MENV', 'Pig','Duck','Cat','GHV','MOJV', 'EBOV', 
+                 'LLOV', 'Cattle')]
 ```
 
 ```{r}
@@ -56,7 +57,7 @@ plot(3:8,a)
 ```
 
 ```{r}
-rf2 <- randomForest(MOJV ~ ., data = TrainSet, ntree = 1000, mtry = 5, importance = TRUE)
+rf2 <- randomForest(MOJV ~ ., data = TrainSet, ntree = 1000, mtry = 8, importance = TRUE)
 rf2
 ```
 ```{r}
